@@ -1,1 +1,0 @@
-from pydoc.main import *

@@ -9,13 +9,12 @@ import textwrap
 import os
 from pathlib import Path
 
-parser = argparse.ArgumentParser(description='Convert script to markdown.')
-parser.add_argument('--module', type=str, help='path to module .. all nested *.py files are taken into account')
-parser.add_argument('--target', type=str, help='list of excluded files resp. folders')
-parser.add_argument('--exclude', nargs='*', help='list of excluded files resp. folders', default=[])
-
 
 def main():
+    parser = argparse.ArgumentParser(description='Convert script to markdown.')
+    parser.add_argument('--module', type=str, help='path to module .. all nested *.py files are taken into account')
+    parser.add_argument('--target', type=str, help='list of excluded files resp. folders')
+    parser.add_argument('--exclude', nargs='*', help='list of excluded files resp. folders', default=[])
     args = parser.parse_args()
 
     files = [f for f in Path(args.module).rglob('*.py')
