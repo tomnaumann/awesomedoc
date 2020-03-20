@@ -32,7 +32,10 @@ for file in files:
     relpath = os.path.relpath(str(file), args.module)  # cut the path to module
     target_path = os.path.join(args.target, relpath)  # join the relative path with the target folder
     path = os.path.splitext(target_path)[0] + ".md"  # change file extension '.py' to '.md'
-    os.makedirs(os.path.dirname(path))  # create directories if not existing
+
+    if not os.path.exists(os.path.dirname(path)):
+        os.makedirs(os.path.dirname(path))  # create directories if not existing
+
     with open(path, "x") as output:
         with open(str(file)) as fd:
             file_contents = fd.read()
