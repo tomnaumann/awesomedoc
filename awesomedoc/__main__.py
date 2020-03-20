@@ -1,7 +1,7 @@
 """
 http://gabrielelanaro.github.io/blog/2014/12/12/extract-docstrings.html
 
-python mydocstringtest/main.py --module "mydocstringtest" --exclude "mydocstringtest\nested" "any\other\exclusion" > readme.md
+python mydocstringtest/__main__.py --module "mydocstringtest" --exclude "mydocstringtest\nested" "any\other\exclusion" > readme.md
 """
 import argparse
 import ast
