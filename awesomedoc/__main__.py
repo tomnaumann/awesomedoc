@@ -89,18 +89,25 @@ def main():
                             is_enum = True
 
                         headline = "{} {}".format("#"*level, node.name)
-                        if isinstance(node, ast.FunctionDef):
-                            if len(node.args.args) > 0:
-                                headline = headline + "("
+                        headline = headline + "("
+                        if isinstance(node, ast.ClassDef) and hasattr(node, 'bases') is True:
+                            for i, par in enumerate(node.bases):
+                                if i != 0:
+                                    headline = headline + ", "
+                                if hasattr(par, 'id'):
+                                    headline = headline + par.id
+                                elif hasattr(par, 'attr'):
+                                    headline = headline + par.attr
 
+                        if isinstance(node, ast.FunctionDef):
                             for i, par in enumerate(node.args.args):
                                 if i != 0:
                                     headline = headline + ", "
-                                # headline = headline + par.arg + ": " + type(par.arg).__name__
                                 headline = headline + par.arg
+                                if hasattr(par, 'annotation') and hasattr(par.annotation, 'id'):
+                                    headline = headline + ': ' + par.annotation.id
 
-                            if len(node.args.args) > 0:
-                                headline = headline + ")"
+                        headline = headline + ")"
                         write(output, headline)
 
                         if ast.get_docstring(node) is not None:
