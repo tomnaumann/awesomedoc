@@ -7,7 +7,15 @@ import argparse
 import ast
 import textwrap
 import os
+from enum import Enum
 from pathlib import Path
+
+INDENT = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+
+
+class Required(Enum):
+    NO = "No"
+    YES = "Yes"
 
 
 def main():
@@ -43,7 +51,7 @@ def main():
             write(output, "# {}".format(os.path.basename(str(file))))
             write(output, "*{}*".format(relpath.replace("\\", "/")))
 
-            def extract(nodes, level):
+            def extract(nodes, level, is_enum=False):
                 for node in nodes:
                     if level == 2 and isinstance(node, ast.Expr):
                         docstring = None
@@ -56,7 +64,30 @@ def main():
                             write(output, node.value.s[1:-1])
                             write(output, "```")
 
+                    if is_enum and isinstance(node, ast.Assign):
+                        write(output, '| {} | {} |'.format(node.targets[0].id, node.value.s))
+
+                    if isinstance(node, ast.AnnAssign):
+                        write(output, '**{}**\n'.format(node.target.id))
+                        default_value = None
+                        required = Required.YES
+                        if isinstance(node.value, ast.NameConstant):
+                            default_value = node.value.value
+                            required = Required.NO
+                        write(output, INDENT + 'Required: {}\n'.format(required.value))
+                        if required is Required.NO:
+                            write(output, INDENT + 'Default: {}\n'.format(default_value))
+                        if hasattr(node.annotation, 'id'):
+                            type_value = node.annotation.id
+                        else:
+                            type_value = '{}[{}]'.format(node.annotation.value.id, node.annotation.slice.value.id)
+                        write(output, INDENT + 'Type: {}\n'.format(type_value))
+
                     if isinstance(node, ast.FunctionDef) or isinstance(node, ast.ClassDef):
+                        is_enum = False
+                        if hasattr(node, 'bases') is True and any(hasattr(b, 'id') and b.id == 'Enum' for b in node.bases):
+                            is_enum = True
+
                         headline = "{} {}".format("#"*level, node.name)
                         if isinstance(node, ast.FunctionDef):
                             if len(node.args.args) > 0:
@@ -77,10 +108,14 @@ def main():
                             write(output, textwrap.dedent(ast.get_docstring(node)))
                             write(output, "```")
                         else:
-                            write(output, "Description missing.")
+                            write(output, "Description missing.\n")
+
+                        if is_enum:
+                            write(output, '| Name | Value |')
+                            write(output, '| --- | --- |')
 
                         if len(node.body) > 0:
-                            extract(node.body, level+1)
+                            extract(nodes=node.body, level=level+1, is_enum=is_enum)
 
             extract(module.body, 2)
 
