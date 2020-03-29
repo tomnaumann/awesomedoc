@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='awesomedoc',
     packages=['awesomedoc'],
-    version='0.0.3.alpha',
+    version='0.0.4.alpha',
     license='MIT',
     description='Generate simple markdown from python scripts',
     author='Tom Naumann',

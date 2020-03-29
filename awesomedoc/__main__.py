@@ -52,7 +52,7 @@ def main():
             write(output, "*{}*".format(relpath.replace("\\", "/")))
 
             def extract(nodes, level, is_enum=False):
-                for node in nodes:
+                for nx, node in enumerate(nodes):
                     if level == 2 and isinstance(node, ast.Expr):
                         docstring = None
                         try:
@@ -66,6 +66,8 @@ def main():
 
                     if is_enum and isinstance(node, ast.Assign):
                         write(output, '| {} | {} |'.format(node.targets[0].id, node.value.s))
+                        if nx == len(nodes)-1:
+                            write(output, '')  # Additional linebreak after enumeration table
 
                     if isinstance(node, ast.AnnAssign):
                         write(output, '**{}**\n'.format(node.target.id))
